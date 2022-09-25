@@ -11,11 +11,6 @@ typedef struct Node{
 node* head; // 要宣告global 才方便操作
 
 
-node* sortList(){
-
-}
-
-
 node* deleteNode(node* linkedList, int find){
     node* cursor = linkedList;
     node* follow = linkedList;
@@ -45,8 +40,6 @@ node* deleteNode(node* linkedList, int find){
     printf("Element not found...\n");
     return linkedList;
 }
-
-
 
 
 int listLength(node* linkedList){
@@ -130,6 +123,28 @@ int searchNodeVal(node* linkedList, int val){
 }
 
 
+void sortList(node* linkedList){
+    node* temp1 = linkedList;
+    node* temp2 = linkedList->next;
+    int reg;
+    
+    for (int i=0;i<listLength(linkedList)-1;i++){
+        for (int j=0;j<listLength(linkedList)-1-i;j++){
+            if (temp1->data > temp2->data){
+                reg = temp1->data;
+                temp1->data = temp2->data;
+                temp2->data = reg;
+            }
+
+            temp1 = temp1->next;
+            temp2 = temp2->next;
+        }
+
+
+    }
+}
+
+
 void printAll(node* linkedList){
     node* cursor = linkedList;
     if (cursor == NULL)
@@ -183,6 +198,8 @@ int main(){
     updateNode(head, 0, 1000);
     printAll(head);
     printf("%d\n",listLength(head));
+    // sortList(head);
+    // printAll(head);
 
 
 // 曾經有一隻貓貓說: -=0perdfgttttttttttttttttttttttttttttttthyjjjjjjjjjuiiiiiiii 貓貓在此給我靈感www
