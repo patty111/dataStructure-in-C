@@ -43,14 +43,35 @@ node* sortList(){
 }
 
 
-node* addNode(node* linkedList,int insertIndex, int value){
-    
+node* addNode(node* linkedList,int insertIndex, int val){
+    if (insertIndex < 0){
+        printf("Index Error\n");
+        return linkedList;
+    }
 
-
+    node* temp = linkedList;
+    for (int i=0;i<=insertIndex;i++){
+        if(i == insertIndex){
+            temp->next = (node*)malloc(sizeof(node));
+            temp = temp->next;
+            temp->next = NULL;
+            temp->data = val;
+            return linkedList;
+        }
+        temp = temp->next;
+    }
 }
 
 
-node* updateNode(node* linkedList, int nodeIndex, int newVal){
+/* 又有一隻貓貓在這邊留下了腳印 2022/9/25(日)
+5rrrrrrr
+fortran'''''''''''''''''''''''
+}
+
+6555555555555555555tttttttttttttttttt6
+*/
+
+updateNode(node* linkedList, int nodeIndex, int newVal){
 
 
 }
@@ -104,6 +125,7 @@ int main(){
     
     printAll(head);
     printf("\n");
+    head = addNode(head,9,11);
     head = deleteNode(head, 10);
     head = deleteNode(head, 5);
     head = deleteNode(head, 1);
