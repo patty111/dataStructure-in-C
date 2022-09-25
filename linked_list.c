@@ -185,7 +185,6 @@ int main(){
     printf("%d\n",listLength(head));
 
 
-
 // 曾經有一隻貓貓說: -=0perdfgttttttttttttttttttttttttttttttthyjjjjjjjjjuiiiiiiii 貓貓在此給我靈感www
     return 0;
 }   
