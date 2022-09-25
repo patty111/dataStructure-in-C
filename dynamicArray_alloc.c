@@ -7,7 +7,7 @@
 int main(){
     // 1D int array
     int arrsize = 5;
-    int *arr = (int*)malloc(arrsize*sizeof(int));
+    int* arr = (int*)malloc(arrsize*sizeof(int));
     for (int i=0;i<arrsize;i++) 
         arr[i] = i + 1;
     
@@ -20,7 +20,7 @@ int main(){
     // 2D int array
     int r = 3, c = 4, count = 1;
     
-    int **twoD_arr = (int**)malloc(sizeof(int*) * r);
+    int** twoD_arr = (int**)malloc(sizeof(int*) * r);
     for (int i=0;i<r;i++) 
         twoD_arr[i] = (int*)malloc(sizeof(int) * c);
 

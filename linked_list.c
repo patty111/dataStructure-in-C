@@ -6,42 +6,60 @@ typedef struct Node{
     int data;
     struct Node *next;  
 }node;
-// typedef struct Node node;
-node* head;
 
-void deleteNode(node* linkedList, int find){
+// typedef struct Node node;
+node* head; // 要宣告global 才方便操作
+
+
+node* deleteNode(node* linkedList, int find){
     node* cursor = linkedList;
     node* follow = linkedList;
     if (cursor == NULL){
         printf("Not Found\n");
-        return;
+        return NULL;
     }
     
     if (cursor->data == find){
         linkedList = linkedList->next;
         free(cursor);
-        return;
+        return linkedList;
     }
 
     cursor = linkedList->next;
     while (cursor != NULL){
         if (cursor->data == find){
-            linkedList->next = cursor->next;
-            free(cursor); // not sure if it's right
-            return;
+            follow->next = cursor->next;
+            free(cursor);
+            return linkedList;
         }
         cursor = cursor->next;
-        linkedList = linkedList->next;
+        follow = follow->next;
     }
 }
 
 
-void appendNode(node* linkedList,int insertIndex, int value){
+node* sortList(){
 
+}
+
+
+node* addNode(node* linkedList,int insertIndex, int value){
+    
 
 
 }
 
+
+node* updateNode(node* linkedList, int nodeIndex, int newVal){
+
+
+}
+
+
+int searchNodeVal(node* linkedList, int val){
+    int index;
+    return index;
+}
 
 void printAll(node* linkedList){
     node* cursor = linkedList;
@@ -56,8 +74,8 @@ void printAll(node* linkedList){
 
 
 void createLinkedList(int nodeCount){
-    head = (node*)malloc(sizeof(node*));
-    node *current;
+    head = (node*)malloc(sizeof(node));
+    node* current;
     
     if (nodeCount == 0)
         return;
@@ -76,8 +94,8 @@ void createLinkedList(int nodeCount){
 
 
 int main(){
-    node* current;
     int nodeCount;
+
     printf("Enter how many Nodes: ");
     scanf("%d",&nodeCount);
 
@@ -86,11 +104,12 @@ int main(){
     
     printAll(head);
     printf("\n");
-    deleteNode(head, 1);
+    head = deleteNode(head, 10);
+    head = deleteNode(head, 5);
+    head = deleteNode(head, 1);
     printAll(head);
-    // deleteNode(head, 10);
-    // deleteNode(head, 5);
 
 
+// 曾經有一隻貓貓說: -=0perdfgttttttttttttttttttttttttttttttthyjjjjjjjjjuiiiiiiii 貓貓在此給我靈感www
     return 0;
 }   
