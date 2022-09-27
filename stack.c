@@ -39,17 +39,37 @@ bool isFull(stack* Stack){
 // but Stack->element points to another memory location where stores an array is fine(?) (I hope i understand it right)
 void push(stack* Stack, int value){
     if (isFull(Stack)){
-        printf("Stack is full... \n");
+        printf("Stack Overflow...\n");
         return;
     }
     Stack->element[++(Stack->top)] = value; 
 }
 
+
+int size(stack* Stack){
+    return Stack->top+1;
+}
+
+
+int pop(stack* Stack){
+    if (isEmpty(Stack)){
+        printf("Stack Underflow... \n");
+        return 0;
+    }
+    return Stack->element[Stack->top--];
+}
+
+
 int main(){
     stack* a;
     a = stackCreate(10);
     push(a, 10);
-    printf("%d\n",a->element[0]);
+    push(a,6);
+    push(a,33);
+    printf("%d\n",size(a));
+    int l = pop(a);
+    printf("%d\n",l);
+    printf("%d\n",size(a));
 
 
 

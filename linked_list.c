@@ -19,6 +19,7 @@ node* deleteNode(node* linkedList, int find){
         return NULL;
     }
     
+    // find 在第一個
     if (cursor->data == find){
         linkedList = linkedList->next;
         free(cursor);
