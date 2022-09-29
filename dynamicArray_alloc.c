@@ -7,7 +7,7 @@
 int main(){
     // 1D int array
     int arrsize = 5;
-    int* arr = (int*)malloc(arrsize*sizeof(int));
+    int* arr = (int*)malloc(arrsize * sizeof(int));
     for (int i=0;i<arrsize;i++) 
         arr[i] = i + 1;
     
