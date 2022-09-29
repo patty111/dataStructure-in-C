@@ -14,13 +14,10 @@ void Zero(poly* Polynomial){
 
 
 int main(){
-
     poly* polyA; poly* polyB; poly* polyC;
     int startA = 0, startB, startC, endA, endB, endC;
     Zero(polyC);
     
-
-
 
 
 

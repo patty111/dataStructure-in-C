@@ -15,7 +15,6 @@ void push();
 int pop();
 
 
-
 stack* stackCreate(int stackSize){
     stack* newStack = (stack*)malloc(sizeof(stack));
     newStack->top = -1;
