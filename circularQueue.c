@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <limits.h>
 
 #define QUEUE_EMPTY INT_MIN
 
@@ -75,7 +76,7 @@ int main(){
     queue* a = queueCreate(8);
     int nums[8] = {3,2,0,1,7,4,6};
 
-    for (int i=0;i<7;i++){
+    for (int i=0;i<7;i++)
         enqueue(a, nums[i]);
 
     for (int i=0;i<7;i++)
