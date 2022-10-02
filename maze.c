@@ -1,7 +1,8 @@
-#include <ctype.h>
-#include <string.h>
+#include "stack.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+
 int maze[13][17] = {
                     {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
                     {1,0,1,0,0,0,1,1,0,0,0,1,1,1,1,1,1},
@@ -22,12 +23,17 @@ int maze[13][17] = {
 typedef struct Move{
     int horizontal;
     int vertical;
-}Move;
+}move;
 
-                    
+typedef struct Element{
+    int row;
+    int column;
+    int dir;
+}element;         
+
 
 int main(){
-    
+    element mark[13][17] = {};
 
 
 
