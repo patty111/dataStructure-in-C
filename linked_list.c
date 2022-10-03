@@ -151,10 +151,12 @@ void printAll(node* linkedList){
     if (cursor == NULL)
         printf("Nothing in list...\n");
     else
-        while (cursor != NULL){
+        // while (cursor != NULL){
+        //     printf("%d - ",cursor->data);
+        //     cursor = cursor->next;
+        // }
+        for (;cursor != NULL; cursor = cursor->next)
             printf("%d - ",cursor->data);
-            cursor = cursor->next;
-        }
         printf("\n");
 }
 
