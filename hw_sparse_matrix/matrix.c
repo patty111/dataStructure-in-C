@@ -43,7 +43,7 @@ matrix read_matrix(matrix M){
     return M;
 }
 
-
+// matrix all 0
 matrix blank_matrix_create(int r, int c){
     matrix M;
     M.terms[0].row = r;
@@ -84,7 +84,6 @@ matrix matrix_create(int r, int c){
 
 void print_matrix(matrix M){
     int flag = 1;
-    clock_t begin = clock();
     for (int i=0;i<M.terms[0].row;i++){
         printf("[");
         for (int j=0;j<M.terms[0].col;j++){
@@ -95,22 +94,19 @@ void print_matrix(matrix M){
         }
         printf(" ]\n");
     }
-        clock_t end = clock();
-        printf("runtime: %lf\n",(double)(end-begin)/CLOCKS_PER_SEC); printf("\n");
 }
 
 
 void print_terms(matrix M){
     printf("     | row | col |value\n");
     for (int i=0;i<M.terms[0].value+1;i++){
-        printf("--------------------\n");
+        printf("------------------------\n");
         printf("a[%2d]| %3d | %3d | %3d \n",i,M.terms[i].row,M.terms[i].col,M.terms[i].value);
     }printf("\n");
 }
 
 
 matrix fast_transpose(matrix M,int printornot){
-    clock_t begin = clock();
     int col_count[MAX_TERMS] = {0}, index[MAX_TERMS] = {1};
     for (int i=1;i<=M.terms[0].value;i++)
         col_count[M.terms[i].col]++;
@@ -130,8 +126,6 @@ matrix fast_transpose(matrix M,int printornot){
         index[M.terms[i].col]++;
     }
 
-    clock_t end = clock();
-    printf("transpose runtime: %lf\n",(double)(end-begin)/CLOCKS_PER_SEC); printf("\n");
     if (printornot) print_matrix(new_matrix);
     return new_matrix;
 }
@@ -146,7 +140,7 @@ matrix fast_transpose(matrix M,int printornot){
 // }
 
 
-matrix matrix_multiply(matrix A, matrix B){
+matrix matrix_multiply(matrix A, matrix B, int printornot){
     matrix C;
 
     B = fast_transpose(B, 0);
@@ -156,8 +150,28 @@ matrix matrix_multiply(matrix A, matrix B){
         for (int j=1;j<=B.terms[0].value;j++)
             if (A.terms[i].col == B.terms[j].col)
                 C.array[A.terms[i].row][B.terms[j].row] += A.terms[i].value * B.terms[j].value;
+    C = read_matrix(C);
+    if (printornot) print_matrix(C);
+    return C;
+}
 
-    return read_matrix(C);
+
+matrix hadamard_product(matrix A, matrix B, int printornot){
+    int count = 1;
+    matrix result = blank_matrix_create(A.terms[0].row, A.terms[0].col);
+    
+    for (int i=1;i<=A.terms[0].value;i++){
+        for (int j=1;j<=B.terms[0].value;j++){
+            if (A.terms[i].row == B.terms[j].row && A.terms[i].col == B.terms[j].col){
+                result.terms[count].value = A.terms[i].value * B.terms[j].value;
+                result.terms[count].row = A.terms[i].row;
+                result.terms[count++].col = A.terms[i].col;
+            }
+        }
+    }
+    result.terms[0].value = count - 1;
+    if (printornot) print_matrix(result);
+    return result;
 }
 
 
@@ -168,6 +182,21 @@ int find_index(char matrix_names[][20],matrix matrix_arr[20],char name[],int ind
     return -1;
 }
 
+
+// void matrix_delete(matrix M){
+//     for (int i=0;i<M.terms[0].row;i++)  
+//         free(M.array[i]);
+//     free(M.array);
+//     for (int i=0;i<MAX_TERMS;i++){
+//         free(M.terms[i].col);
+//         free(M.terms[i].row);
+//         free(M.terms[i].value);
+//     }
+// }
+
+
+
+
 int main(){
     matrix matrix_arr[20];
     char matrix_name[20][20];
@@ -177,12 +206,11 @@ int main(){
     while (loop == 1){
         int key;
         int r,c;
-        // list out remaining matrix
-        printf("\nMatrix in list: ");
-        // for (int i=0;i<=5;i++) printf("%s ",matrix_name[i]);
-    printf("%s ",matrix_name[0]);printf("%s ",matrix_name[1]);printf("%s ",matrix_name[2]);
         
-        printf("\n0. Quit\n1. create matrix    2. create blank matrix\n3. fast transpose   4. matrix multiply\n5. print matrix     6. print matrix terms\n");
+        // list out commands and remaining matrix
+        printf("\n0. Quit\n1. create matrix    2. create blank matrix\n3. fast transpose   4. matrix multiply\n5. Hadamard Product 6. get submatrix\n7. print matrix     8. print matrix terms\n");
+        printf("Matrix in list: %s", cursor > -1 ? " " : "None");
+        for (int i=0;i<10;i++) printf("%s ",matrix_name[i]);printf("\n> ");
         scanf("%d",&key);
 
         switch (key){
@@ -198,6 +226,11 @@ int main(){
                 break;
             
             case 2:
+                printf("Enter matrix name:\n");
+                scanf("%s",matrix_name[++cursor]);
+                printf("Enter matrix size(r c):");
+                scanf("%d %d",&r,&c);
+                matrix_arr[cursor] = blank_matrix_create(r,c);
                 break;
             
             case 3:
@@ -213,7 +246,7 @@ int main(){
                     printf("Not enough Matrix...\n");
                     break;
                 }
-                printf("Enter 2 matrices name you want to multiply(A * B = C):\n");
+                printf("Enter 2 matrices' name that you want to multiply(A * B = C):\n");
                 scanf("%s %s",name1,name2);
                 find1 = find_index(matrix_name,matrix_arr,name1,cursor);
                 find2 = find_index(matrix_name,matrix_arr,name2,cursor);
@@ -224,18 +257,40 @@ int main(){
 
                 printf("Enter matrix name to store the result:\n");
                 scanf("%s",matrix_name[++cursor]);
-                matrix_arr[cursor] = matrix_multiply(matrix_arr[find1],matrix_arr[find2]);
+                matrix_arr[cursor] = matrix_multiply(matrix_arr[find1],matrix_arr[find2], 1);
                 break;
 
             case 5:
+                if (cursor < 1){
+                    printf("Not enough Matrix...\n");
+                    break;
+                }
+                printf("Enter 2 matrices' name to do Hadamard Product (A ⊙ B = C):\n");
+                scanf("%s %s",name1,name2);
+                find1 = find_index(matrix_name,matrix_arr,name1,cursor);
+                find2 = find_index(matrix_name,matrix_arr,name2,cursor);
+                if (matrix_arr[find1].terms[0].row != matrix_arr[find2].terms[0].row || matrix_arr[find1].terms[0].col != matrix_arr[find2].terms[0].col){
+                    printf("Matrix can't do Hadamard Product...\n");
+                    break;
+                }
+
+                printf("Enter matrix name to store the result:\n");
+                scanf("%s",matrix_name[++cursor]);
+                matrix_arr[cursor] = hadamard_product(matrix_arr[find1],matrix_arr[find2], 1);
+                break;
+
+            case 6:
+                break;
+
+            case 7:
                 printf("Enter name of matrix you want to print: \n");
                 scanf("%s",name1);
                 find1 = find_index(matrix_name,matrix_arr,name1,cursor);
                 print_matrix(matrix_arr[find1]);
                 break;
 
-            case 6:
-                printf("Enter name of matrix you want to print its terms: \n");
+            case 8:
+                printf("Enter name of matrix you want to print it's terms: \n");
                 scanf("%s",name1);
                 find1 = find_index(matrix_name,matrix_arr,name1,cursor);
                 print_terms(matrix_arr[find1]);

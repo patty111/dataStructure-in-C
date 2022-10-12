@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-typedef struct Stack{
+typedef struct{
     int maxsize;
     int top;
     int* element;
@@ -60,23 +60,3 @@ int ISpop(stack_for_int* Stack){
     }
     return Stack->element[Stack->top--];
 }
-
-
-int main(){
-    stack_for_int* a;
-    a = ISCreate(10);
-    ISpush(a, 10);
-    ISpush(a,6);
-    ISpush(a,33);
-    printf("%d\n",ISsize(a));
-    int l = ISpop(a);
-    printf("%d\n",l);
-    printf("%d\n",ISsize(a));
-
-    printf("%d\n",ISpeek(a));
-
-
-
-
-    return 0;
-}   
