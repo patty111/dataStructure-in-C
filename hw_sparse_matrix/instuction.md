@@ -157,14 +157,14 @@ matrix hadamard_product(matrix A, matrix B, int printornot)
 
 #### 7. print matrix
 > 1. 輸入要印出的矩陣名字
-> 2. 印出矩陣
+> 2. 印出矩陣  
 
 ![print matrix](img/print_matrix.png)
 ***[menu](#matrix-hw)*** 
 
 #### 8. print terms
 > 1. 輸入要印出的矩陣名字
-> 2. 以課本中 *sparse matrix* 表示法印出矩陣
+> 2. 以課本中 *sparse matrix* 表示法印出矩陣  
 
 ![print terms](img/print_terms.png)
 ***[menu](#matrix-hw)*** 
