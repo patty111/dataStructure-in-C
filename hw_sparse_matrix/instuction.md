@@ -9,9 +9,10 @@
 >   * *[3. fast transpose](#3-fast-transpose)*
 >   * *[4. matrix multiply](#4-matrix-multiply)*
 >   * *[5. hadamard product](#5-hadamard-product)*
->   * *[6. get submatrix](#6-get-submatrix)*
+>   * *[6. print submatrix](#6-get-submatrix)*
 >   * *[7. print matrix](#7-print-matrix)*
 >   * *[8. print terms](#8-print-terms)*
+>   * *[9. matrix update](#9-matrix-update)*
 > * ***[時間複雜度分析](#時間複雜度分析)***
 >
 ![matrixA](img/matrixA.png)  
@@ -50,7 +51,6 @@ typedef struct{
 // 存放一 matrix 中所有的非零值
 typedef struct{
     terms terms[MAX_TERMS];  // MAX_TERMS = 101
-    int** array;
 }matrix
 ```
 ---
@@ -79,6 +79,11 @@ void print_terms(matrix M)
 matrix fast_transpose(matrix M, int printornot)
 
 > 傳入一矩陣並以課本演算法進行轉置並回傳結果。如 printornot = 1 則輸出轉置結果
+```
+```c
+void print_submatrix(matrix M, int* r, int* c, int lenR, int lenC)
+
+> 傳入一矩陣與兩個存放 subrows, subcolumns的陣列，印出submatrix
 ```
 ```c
 matrix matrix_multiply(matrix A, matrix B, int printornot)
@@ -133,8 +138,8 @@ matrix hadamard_product(matrix A, matrix B, int printornot)
 
 #### 5. Hadamard product
 ***[menu](#matrix-hw)*** 
-> 1. 輸入要相乘的兩個矩陣名字，名字中間用空格分開
-> - 如兩矩陣無法進行 element-wise-product，則會跳出錯誤訊息並退出執行指令 
+> 1. 輸入要進行 *element-wise-product*的兩個矩陣名字，名字中間用空格分開
+> - 如兩矩陣無法進行 *element-wise-product*，則會跳出錯誤訊息並退出執行指令 
 > 
 > 2. 輸入要存放結果的矩陣名稱
 > 3. 指令會回傳並印出結果
@@ -142,21 +147,35 @@ matrix hadamard_product(matrix A, matrix B, int printornot)
 ![Hadamard_Product](img/hadamard.png)
 
 #### 6. get submatrix
+> 1. 輸入要取子矩陣的矩陣名稱
+> 2. 輸入子矩陣大小 $r * c$，中間用空格分開
+> 3. 分別輸入要取得的 subrows 和 subcolumns
+> 4. 輸出子矩陣
+
+![submatrix](img/submatrix.png)
 ***[menu](#matrix-hw)*** 
 
 #### 7. print matrix
 > 1. 輸入要印出的矩陣名字
-> 2. 程式以輸出矩陣
+> 2. 印出矩陣
 
 ![print matrix](img/print_matrix.png)
 ***[menu](#matrix-hw)*** 
 
 #### 8. print terms
 > 1. 輸入要印出的矩陣名字
-> 2. 以 *sparse matrix* 表示法輸出結果
+> 2. 以課本中 *sparse matrix* 表示法印出矩陣
 
 ![print terms](img/print_terms.png)
 ***[menu](#matrix-hw)*** 
+
+#### 9. matrix update
+> 1. 輸入要修改的矩陣名字
+> 2. 輸入新的矩陣大小 $r \times n$
+> 3. 輸入新的矩陣值
+> 
+***[menu](#matrix-hw)*** 
+
 
 ---
 ## 時間複雜度分析
