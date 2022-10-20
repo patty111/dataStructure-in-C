@@ -108,7 +108,8 @@ matrix fast_transpose(matrix M,int printornot){
         index[M.terms[i].col]++;
     }
 
-    if (printornot) print_matrix(new_matrix);
+    if (printornot)
+        print_matrix(new_matrix);
     return new_matrix;
 }
 
@@ -123,7 +124,8 @@ void print_submatrix(matrix M, int* r, int* c, int lenR, int lenC){
                     flag = 0;
                 }
             }
-            if (flag) printf("0 ");
+            if (flag) 
+                printf("0 ");
         }
         printf("\n");
     }
@@ -148,15 +150,18 @@ matrix matrix_multiply(matrix A, matrix B, int printornot){
                         flag = 0;
                     }
                 } // 不重複
+
                 if (flag){
-                C.terms[++C_cursor].row = A.terms[i].row;
-                C.terms[C_cursor].col = B.terms[j].row;
-                C.terms[C_cursor].value = A.terms[i].value * B.terms[j].value;
-                C.terms[0].value++;}
+                    C.terms[++C_cursor].row = A.terms[i].row;
+                    C.terms[C_cursor].col = B.terms[j].row;
+                    C.terms[C_cursor].value = A.terms[i].value * B.terms[j].value;
+                    C.terms[0].value++;
+                }
             }
         }
     }
-    if (printornot) print_matrix(C);
+    if (printornot)
+        print_matrix(C);
     return C;
 }
 
@@ -175,7 +180,8 @@ matrix hadamard_product(matrix A, matrix B, int printornot){
         }
     }
     result.terms[0].value = count - 1;
-    if (printornot) print_matrix(result);
+    if (printornot)
+        print_matrix(result);
     return result;
 }
 
@@ -203,7 +209,7 @@ int main(){
         // list out commands and remaining matrix
         printf("\n0. Quit\n1. create matrix    2. create blank matrix\n3. fast transpose   4. matrix multiply\n5. Hadamard Product 6. get submatrix\n7. print matrix     8. print matrix terms\n9. matrix update\n");
         printf("Matrix in list: %s", cursor > -1 ? " " : "None");
-        for (int i=0;i<10;i++) printf("%s ",matrix_name[i]);printf("\n> ");
+        for (int i=0;i<20;i++) printf("%s ",matrix_name[i]);printf("\n> ");
         scanf("%d",&key);
 
         switch (key){

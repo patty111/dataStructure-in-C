@@ -13,7 +13,7 @@
 >   * *[7. print matrix](#7-print-matrix)*
 >   * *[8. print terms](#8-print-terms)*
 >   * *[9. matrix update](#9-matrix-update)*
-> * ***[時間複雜度分析](#時間複雜度分析)***
+<!-- > * ***[時間複雜度分析](#時間複雜度分析)*** -->
 >
 ![matrixA](img/matrixA.png)  
 
@@ -148,7 +148,7 @@ matrix hadamard_product(matrix A, matrix B, int printornot)
 
 #### 6. get submatrix
 > 1. 輸入要取子矩陣的矩陣名稱
-> 2. 輸入子矩陣大小 $r * c$，中間用空格分開
+> 2. 輸入子矩陣大小 $r \times c$，中間用空格分開
 > 3. 分別輸入要取得的 subrows 和 subcolumns
 > 4. 輸出子矩陣
 
@@ -177,5 +177,3 @@ matrix hadamard_product(matrix A, matrix B, int printornot)
 ***[menu](#matrix-hw)*** 
 
 
----
-## 時間複雜度分析

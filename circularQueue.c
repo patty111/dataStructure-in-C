@@ -10,6 +10,7 @@ typedef struct Queue{
     int* elements;
 }queue;
 
+
 queue* queueCreate(int size){
     queue* newQueue = (queue*)malloc(sizeof(queue));
     newQueue->size = size;
