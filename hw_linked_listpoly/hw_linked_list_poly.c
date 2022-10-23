@@ -80,29 +80,28 @@ void readPoly(node** poly){
 
         current->next = (node*)malloc(sizeof(node));
         current = current->next;
-        current->next = NULL;
+        current->next = *poly;
     }
-    current->next = *poly;
 }
 
 
-int polyLength(node** poly){
-    int count = 0;
-    if (poly == NULL)
-        return 0;
+// int polyLength(node** poly){
+//     int count = 0;
+//     if (poly == NULL)
+//         return 0;
     
-    node* cursor = *poly;
-    while (!islast(&cursor)){
-        count++;
-        cursor = cursor->next;
-    }
-    return count;
-}
+//     node* cursor = *poly;
+//     while (!islast(&cursor)){
+//         count++;
+//         cursor = cursor->next;
+//     }
+//     return count;
+// }
 
 
 void printPoly(node** poly){
     node* cursor = *poly;
-    if (!polyLength(&cursor)){
+    if (islast(&cursor)){
         printf("0\n");
         return;
     }
@@ -173,7 +172,6 @@ int coeff(node** poly, int expo){
 }
 
 
-
 void erase(node** poly){
     while((*poly)->coeff != 0 && (*poly)->expo != 0){
         node* temp = *poly;
@@ -184,20 +182,11 @@ void erase(node** poly){
 }
 
 
-
 void detach(node** poly, int expo){
     node* cursor = *poly;
     node* temp = (node*)malloc(sizeof(node));
     node* follow = temp;
     int count = 0;
-
-    // while (cursor->expo != expo){
-    //     follow = cursor;
-    //     cursor = cursor->next;
-    //     count++;
-    // }
-
-    // if (count == polyLength(&poly)-1)
 
     if (cursor->expo == expo){   // 第一個
         temp = cursor;
@@ -215,7 +204,6 @@ void detach(node** poly, int expo){
         free(temp);
         
     }
-
 
     return ;
 }
@@ -291,8 +279,7 @@ node** pmult(node** P1, node** P2){
     int mult;
     while (!islast(&cursor1)){
         while (!islast(&cursor2)){
-            // if (cursor1->coeff * cursor2->coeff != 0)
-                attach(resultPoly, cursor1->coeff * cursor2->coeff, cursor1->expo + cursor2->expo);
+            attach(resultPoly, cursor1->coeff * cursor2->coeff, cursor1->expo + cursor2->expo);
             cursor2 = cursor2->next;
             printPoly(resultPoly);
         }
@@ -302,8 +289,6 @@ node** pmult(node** P1, node** P2){
     sortPoly(resultPoly);
     return resultPoly;
 }
-
-
 
 
 int main(){
