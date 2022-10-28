@@ -1,10 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define getName(var)
+/*
+2 6
+5 3
+-3 2
+-8 0
+0 0
+5 6
+3 0
+-6 -2
+9 -5
+0 0
+*/
 
 typedef struct Node{
     int expo;
-    int coeff;
+    double coeff;
     struct Node *next;
 }node;
 
@@ -21,6 +32,15 @@ int compare(node* term1, node* term2){
     // return islast(&term1) || islast(&term2) ? (islast(&term1) * -1 + islast(&term2) * 1) : ((term1->expo > term2->expo) * 1 + (term1->expo == term2->expo) * 0 + (term1->expo < term2->expo) * -1);
 }
 
+
+int degree(node** poly){
+    node* tmp = *poly;
+    int degree = -2147483648;
+    while (!islast(&tmp)){
+        degree = degree < tmp->expo ? tmp->expo : degree;
+        tmp = tmp->next;
+    }return degree;
+}
 
 void sortPoly(node** poly){
     node* tempnode = *poly;
@@ -74,7 +94,7 @@ void readPoly(node** poly){
     node* current = *poly;
     
     while(1){
-        scanf("%d %d", &current->coeff, &current->expo);
+        scanf("%lf %d", &current->coeff, &current->expo);
         if (islast(&current))
             break;
 
@@ -98,7 +118,6 @@ void readPoly(node** poly){
 //     return count;
 // }
 
-
 void printPoly(node** poly){
     node* cursor = *poly;
     if (islast(&cursor)){
@@ -106,16 +125,20 @@ void printPoly(node** poly){
         return;
     }
 
-    printf("%dx^%d", cursor->coeff, cursor->expo);
+    printf("%lfx^%d", cursor->coeff, cursor->expo);
     cursor = cursor->next;
 
     while(!islast(&cursor)){
         // 為了美化格式
-        if (cursor->coeff < 0) 
-            printf(" - %dx^%d", cursor->coeff * -1, cursor->expo);
-        else 
-            printf(" + %dx^%d", cursor->coeff, cursor->expo);
-        cursor = cursor->next;
+        if (cursor->coeff - (int)(cursor->coeff) != 0){
+            if (cursor->coeff < 0) 
+                printf(" - %.0lf^%d", cursor->coeff * -1, cursor->expo);
+            else 
+                printf(" + %.0lfx^%d", cursor->coeff, cursor->expo);
+            cursor = cursor->next;
+        }
+
+        
     }
     printf("\n");
 }
@@ -161,6 +184,33 @@ void attach(node** poly, int coeff, int expo){
 }
 
 
+void detach(node** poly, int expo){
+    node* cursor = *poly;
+    node* temp = (node*)malloc(sizeof(node));
+    node* follow = (node*)malloc(sizeof(node));
+
+    if ((*poly)->expo == expo){   // 第一個
+        temp = cursor;
+        while (!islast(&cursor))
+            cursor = cursor->next;
+        cursor->next = temp->next;
+        *poly = temp->next;
+        free(temp);
+        return;
+    }
+
+    while (!islast(&cursor)){
+        follow = cursor;
+        cursor = cursor->next;
+        if (cursor->expo == expo){
+            follow->next = cursor->next;
+            free(cursor);
+            return;
+        }
+    }
+}
+
+
 int coeff(node** poly, int expo){
     node* cursor = *poly;
     while (!islast(&cursor)){
@@ -179,33 +229,6 @@ void erase(node** poly){
         *poly = (*poly)->next;   
     }
     free(*poly);
-}
-
-
-void detach(node** poly, int expo){
-    node* cursor = *poly;
-    node* temp = (node*)malloc(sizeof(node));
-    node* follow = temp;
-    int count = 0;
-
-    if (cursor->expo == expo){   // 第一個
-        temp = cursor;
-        // free
-    }
-
-    while (!islast(&cursor)){
-        follow = cursor;
-        cursor = cursor->next;
-        if (cursor->expo == expo){
-            temp = cursor;
-            follow->next = cursor->next;
-            // continue;
-        }
-        free(temp);
-        
-    }
-
-    return ;
 }
 
 
@@ -281,7 +304,6 @@ node** pmult(node** P1, node** P2){
         while (!islast(&cursor2)){
             attach(resultPoly, cursor1->coeff * cursor2->coeff, cursor1->expo + cursor2->expo);
             cursor2 = cursor2->next;
-            printPoly(resultPoly);
         }
         cursor2 = *P2;
         cursor1 = cursor1->next;
@@ -291,18 +313,99 @@ node** pmult(node** P1, node** P2){
 }
 
 
+void pdiv(node** P1, node** P2){
+    node** dividor = blankPoly(dividor);
+    node** divident = blankPoly(divident);
+    node** Qpoly = blankPoly(Qpoly);
+    node** Rpoly = blankPoly(Rpoly);
+    while (!islast(P1)){
+        attach(divident, (*P1)->coeff, (*P1)->expo);
+        (*P1) = (*P1)->next;
+    }
+    (*P1) = (*P1)->next;
+
+    while (!islast(P2)){
+        attach(dividor, (*P2)->coeff, (*P2)->expo);
+        (*P2) = (*P2)->next;
+    }
+    (*P2) = (*P2)->next;
+
+// printf("lalalalala\n");
+
+    while (degree(dividor) <= degree(divident)){
+        node** tmp = blankPoly(tmp);
+    //     // power = (*divident)->expo - (*divisor)->expo;
+    //     // coeff = (*divident)->coeff / (*divisor)->coeff;
+        attach(Qpoly, (*divident)->coeff / (*dividor)->coeff, (*divident)->expo - (*P2)->expo);
+        divident = psub(divident, dividor);
+
+
+    //     attach(Qpoly, (*tmp)->coeff, (*tmp)->expo);
+    //     divident = psub(divident, pmult(tmp, P2));
+    }
+    Rpoly = divident;
+
+    printPoly(Qpoly);
+    printPoly(Rpoly);
+
+
+
+
+    // return Qpoly;
+}
+
+
+
 int main(){
     node** P1 = blankPoly(P1);
     node** P2 = blankPoly(P2);
     node** P3 = blankPoly(P3);
-    // printf("Enter coeffiecients and exponents of Polynomial1 from the highset term:\n");
+    printf("Enter 2 Polynomials P1, P2 from the highest term:\n");
     readPoly(P1); 
-    // printf("Enter coeffiecients and exponents of Polynomial2 from the highset term:\n");
     readPoly(P2);
-    printPoly(P1);
-    printPoly(P2);
-    P3 = pmult(P1,P2);
-    printPoly(P3);
+    pdiv(P1, P2);
+    // printPoly(P3);
+    
+
+    // printPoly(P1);
+    // printPoly(P2);
+
+    // int command = 1;
+
+    // while (command){
+    //     printf("P1 = ");printPoly(P1);
+    //     printf("P2 = ");printPoly(P2);
+    //     printf("Enter command: ");
+    //     scanf("%d", &command);printf("\n");
+
+    //     switch (command){
+    //         case 0:
+    //             break;
+            
+    //         case 1: 
+    //             P3 = padd(P1, P2);
+    //             printf("P1 + P2 = "); printPoly(P3);
+    //             break;
+            
+    //         case 2:
+    //             P3 = psub(P1, P2);
+    //             printf("P1 - P2 = "); printPoly(P3);
+    //             break;
+
+    //         case 3:
+    //             P3 = pmult(P1, P2);
+    //             printf("P1 * P2 = "); printPoly(P3);
+    //             break;
+
+    //         // case 4:
+    //         //     P3 = psub(P1, P2);
+    //         //     printf("P1 - P2 = "); printPoly(P3);
+    //         //     break;
+                
+    //     }
+    //     printf("----------------------\n");
+    // }
+
 
 
 
