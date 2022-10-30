@@ -1,23 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
-/*
-2 6
-5 3
--3 2
--8 0
-0 0
-5 6
-3 0
--6 -2
-9 -5
-0 0
-*/
 
 typedef struct Node{
     int expo;
     double coeff;
     struct Node *next;
 }node;
+
+node** P1;node** P2;node** P3;
+
+node** blankPoly(node** poly){
+    poly = (node**)malloc(sizeof(node*));
+    *poly = (node*)malloc(sizeof(node));
+    (*poly)->expo = 0;
+    (*poly)->coeff = 0;
+    (*poly)->next = *poly;
+    return poly;
+}
 
 
 int islast(node** polyterm){
@@ -35,6 +34,8 @@ int compare(node* term1, node* term2){
 
 int degree(node** poly){
     node* tmp = *poly;
+    if (islast(poly))
+        return 0;
     int degree = -2147483648;
     while (!islast(&tmp)){
         degree = degree < tmp->expo ? tmp->expo : degree;
@@ -78,16 +79,6 @@ void sortPoly(node** poly){
 }
 
 
-node** blankPoly(node** poly){
-    poly = (node**)malloc(sizeof(node*));
-    *poly = (node*)malloc(sizeof(node));
-    (*poly)->expo = 0;
-    (*poly)->coeff = 0;
-    (*poly)->next = *poly;
-    return poly;
-}
-
-
 void readPoly(node** poly){
     *poly = (node*)malloc(sizeof(node));
     (*poly)->next = NULL;
@@ -105,52 +96,57 @@ void readPoly(node** poly){
 }
 
 
-// int polyLength(node** poly){
-//     int count = 0;
-//     if (poly == NULL)
-//         return 0;
-    
-//     node* cursor = *poly;
-//     while (!islast(&cursor)){
-//         count++;
-//         cursor = cursor->next;
-//     }
-//     return count;
-// }
-
-void printPoly(node** poly){
+void printPoly(node** poly, int crlf){
     node* cursor = *poly;
     if (islast(&cursor)){
         printf("0\n");
         return;
     }
-
-    printf("%lfx^%d", cursor->coeff, cursor->expo);
+    
+    if (cursor->coeff - (int)cursor->coeff > 0)
+        printf("%lfx^%d", cursor->coeff, cursor->expo);
+    else
+        printf("%.0lfx^%d", cursor->coeff, cursor->expo);
     cursor = cursor->next;
 
     while(!islast(&cursor)){
+        if (cursor->coeff - (int)cursor->coeff == 0){
         // 為了美化格式
-        if (cursor->coeff - (int)(cursor->coeff) != 0){
             if (cursor->coeff < 0) 
-                printf(" - %.0lf^%d", cursor->coeff * -1, cursor->expo);
+                printf(" - %.0lfx^%d", cursor->coeff * -1, cursor->expo);
             else 
                 printf(" + %.0lfx^%d", cursor->coeff, cursor->expo);
-            cursor = cursor->next;
         }
+        else{
+            if (cursor->coeff < 0) 
+                printf(" - %lfx^%d", cursor->coeff * -1, cursor->expo);
+            else 
+                printf(" + %lfx^%d", cursor->coeff, cursor->expo);
 
-        
+        }
+        cursor = cursor->next;
     }
-    printf("\n");
+
+    if (crlf)
+        printf("\n");
 }
 
 
-void attach(node** poly, int coeff, int expo){
-    if (islast(poly))
-        (*poly)->next = *poly;
+void attach(node** poly, double coeff, int expo){
+    if (islast(poly)){
+        // (*poly)->next = *poly;
+        node* temp = (node*)malloc(sizeof(node));
+        temp->coeff = coeff;
+        temp->expo = expo;
+        temp->next = *poly;
+        (*poly)->next = temp;
+        *poly = temp;
+        return;
+    }
+
     node* cursor = (*poly)->next;
     node* follow = *poly;
     node* temp = (node*)malloc(sizeof(node));
-
     
     //最前面
     int flag = 0;
@@ -211,7 +207,7 @@ void detach(node** poly, int expo){
 }
 
 
-int coeff(node** poly, int expo){
+double coeff(node** poly, int expo){
     node* cursor = *poly;
     while (!islast(&cursor)){
         if (expo == cursor->expo)
@@ -219,6 +215,17 @@ int coeff(node** poly, int expo){
         cursor = cursor->next;
     }
     return 0;
+}
+
+
+node** copyPoly(node** source){
+    node** target = blankPoly(target);
+    while (!islast(source)){
+        attach(target, (*source)->coeff, (*source)->expo);
+        (*source) = (*source)->next;
+    }
+    (*source) = (*source)->next;    // 把source從尾指回頭
+    return target;
 }
 
 
@@ -232,11 +239,11 @@ void erase(node** poly){
 }
 
 
-node** padd(node** P1, node** P2){
+node** padd(node** Poly1, node** Poly2){
     int sum = 0;
     node** resultPoly = blankPoly(resultPoly);
-    node* cursor1 = *P1;
-    node* cursor2 = *P2;
+    node* cursor1 = *Poly1;
+    node* cursor2 = *Poly2;
 
     while (!islast(&cursor1) || !islast(&cursor2)){
         switch (compare(cursor1, cursor2)){
@@ -263,13 +270,25 @@ node** padd(node** P1, node** P2){
 }
 
 
-node** psub(node** P1, node** P2){
+node** psub(node** Poly1, node** Poly2){
     int sub = 0;
     node** resultPoly = blankPoly(resultPoly);
-    node* cursor1 = *P1;
-    node* cursor2 = *P2;
+    node* cursor1 = *Poly1;
+    node* cursor2 = *Poly2;
 
     while (!islast(&cursor1) || !islast(&cursor2)){
+        if (cursor1->expo < 0 && islast(&cursor2)){
+            attach(resultPoly, cursor1->coeff, cursor1->expo);
+            cursor1 = cursor1->next;
+            printPoly(resultPoly, 1);
+            continue;
+        } 
+        if (cursor2->expo < 0 && islast(&cursor1)){
+            attach(resultPoly, -1 * cursor2->coeff, cursor2->expo);
+            cursor2 = cursor2->next;
+            continue;
+        } 
+
         switch (compare(cursor1, cursor2)){
             case 1:
                 attach(resultPoly, cursor1->coeff, cursor1->expo);
@@ -294,9 +313,9 @@ node** psub(node** P1, node** P2){
 }
 
 
-node** pmult(node** P1, node** P2){
-    node* cursor1 = *P1;
-    node* cursor2 = *P2;
+node** pmult(node** Poly1, node** Poly2){
+    node* cursor1 = *Poly1;
+    node* cursor2 = *Poly2;
     node** resultPoly = blankPoly(resultPoly);
 
     int mult;
@@ -305,7 +324,7 @@ node** pmult(node** P1, node** P2){
             attach(resultPoly, cursor1->coeff * cursor2->coeff, cursor1->expo + cursor2->expo);
             cursor2 = cursor2->next;
         }
-        cursor2 = *P2;
+        cursor2 = *Poly2;
         cursor1 = cursor1->next;
     }
     sortPoly(resultPoly);
@@ -313,103 +332,139 @@ node** pmult(node** P1, node** P2){
 }
 
 
-void pdiv(node** P1, node** P2){
-    node** dividor = blankPoly(dividor);
-    node** divident = blankPoly(divident);
+node** pdiv(node** Poly1, node** Poly2){
+    node** divident = copyPoly(Poly1);
+    node** divisor = copyPoly(Poly2);
     node** Qpoly = blankPoly(Qpoly);
-    node** Rpoly = blankPoly(Rpoly);
-    while (!islast(P1)){
-        attach(divident, (*P1)->coeff, (*P1)->expo);
-        (*P1) = (*P1)->next;
-    }
-    (*P1) = (*P1)->next;
+    node** Rpoly = copyPoly(Poly1);
 
-    while (!islast(P2)){
-        attach(dividor, (*P2)->coeff, (*P2)->expo);
-        (*P2) = (*P2)->next;
-    }
-    (*P2) = (*P2)->next;
+    do{
+        node** newterm = blankPoly(newterm);
+        attach(newterm, (*divident)->coeff / (*divisor)->coeff, (*divident)->expo - (*divisor)->expo);
+        attach(Qpoly, (*newterm)->coeff, (*newterm)->expo);
 
-// printf("lalalalala\n");
+        divident = psub(divident, pmult(divisor, newterm));
+    } while (degree(divident) >= degree(divisor));
+    Rpoly = copyPoly(divident);
 
-    while (degree(dividor) <= degree(divident)){
-        node** tmp = blankPoly(tmp);
-    //     // power = (*divident)->expo - (*divisor)->expo;
-    //     // coeff = (*divident)->coeff / (*divisor)->coeff;
-        attach(Qpoly, (*divident)->coeff / (*dividor)->coeff, (*divident)->expo - (*P2)->expo);
-        divident = psub(divident, dividor);
+    printPoly(Qpoly, 0);
+    printf(" ... ");
+    printPoly(Rpoly, 1);
 
-
-    //     attach(Qpoly, (*tmp)->coeff, (*tmp)->expo);
-    //     divident = psub(divident, pmult(tmp, P2));
-    }
-    Rpoly = divident;
-
-    printPoly(Qpoly);
-    printPoly(Rpoly);
-
-
-
-
-    // return Qpoly;
+    erase(Rpoly);
+    erase(divisor);
+    erase(divident);
+    return Qpoly;
 }
 
+
+node** findPoly(int num){
+    switch (num){
+        case 1:
+            return P1;
+        case 2:
+            return P2;
+        case 3:
+            return P3;
+    }
+}
 
 
 int main(){
-    node** P1 = blankPoly(P1);
-    node** P2 = blankPoly(P2);
-    node** P3 = blankPoly(P3);
+    P1 = blankPoly(P1);
+    P2 = blankPoly(P2);
+    P3 = blankPoly(P3);
+    
     printf("Enter 2 Polynomials P1, P2 from the highest term:\n");
     readPoly(P1); 
     readPoly(P2);
-    pdiv(P1, P2);
-    // printPoly(P3);
-    
 
-    // printPoly(P1);
-    // printPoly(P2);
+    int command = 1;
+    while (command){
+        printf("-------------------------------------\n");
+        printf("0. Quit\n1. show polynomial             2. show coefficient of given power\n3. add term to polynomial      4. delete term of polynomial\n5. P1 + P2                     6. P1 - P2\n7. P1 * P2                     8. P1 / P2\n9. reset polynomial\n");
+        printf("-------------------------------------\n");
+        printf("P1 = ");printPoly(P1, 1);
+        printf("P2 = ");printPoly(P2, 1);
+        printf("P3 = ");printPoly(P3, 1);
+        printf("-------------------------------------\n> ");
+        scanf("%d", &command);
+        
+        int p;
+        int tmp_power;
+        double tmp_coeff;
+        switch (command){
+            case 0:
+                continue;
 
-    // int command = 1;
+            case 1:
 
-    // while (command){
-    //     printf("P1 = ");printPoly(P1);
-    //     printf("P2 = ");printPoly(P2);
-    //     printf("Enter command: ");
-    //     scanf("%d", &command);printf("\n");
+                printf("Which polynomial(1,2,3): "); scanf("%d",&p);
+                if (p == 1 || p == 2 || p == 3){
+                    printf("P%d = ",p);
+                    printPoly(findPoly(p), 1);
+                }
+                else printf("Polynomial does not exist...\n");
+                break;
 
-    //     switch (command){
-    //         case 0:
-    //             break;
+            case 2:
+                printf("Which polynomial(1,2,3): "); scanf("%d",&p);
+                printf("Which power: "); scanf("%d", &tmp_power);
+                if (p == 1 || p == 2 || p == 3){
+                    tmp_coeff = coeff(findPoly(p),tmp_power);
+                    if (tmp_coeff - (int)tmp_coeff == 0)
+                        printf("x^%d : %.0lf\n",tmp_power, coeff(findPoly(p), tmp_power));
+                    else
+                        printf("x^%d : %lf\n",tmp_power, coeff(findPoly(p), tmp_power));
+                }
+                else printf("Polynomial does not exist...\n");
+                break;
+
+            case 3:
+                printf("Which polynomial(1,2,3): "); scanf("%d",&p);
+                printf("Power to add: "); scanf("%d", &tmp_power);
+                printf("Coefficient of power: "); scanf("%lf", &tmp_coeff);
+                if (p == 1 || p == 2 || p == 3)
+                    attach(findPoly(p), tmp_coeff, tmp_power);
+                else printf("Polynomial does not exist...\n");
+                break;
+
+            case 4:
+                printf("Which polynomial(1,2,3): "); scanf("%d",&p);
+                printf("Power to delete: "); scanf("%d", &tmp_power);
+                if (p == 1 || p == 2 || p == 3)
+                    detach(findPoly(p), tmp_power);
+                else printf("Polynomial does not exist...\n");
+                break;
+
+            case 5: 
+                P3 = padd(P1, P2);
+                printf("P1 + P2 = P3 = "); printPoly(P3, 1);
+                break;
             
-    //         case 1: 
-    //             P3 = padd(P1, P2);
-    //             printf("P1 + P2 = "); printPoly(P3);
-    //             break;
-            
-    //         case 2:
-    //             P3 = psub(P1, P2);
-    //             printf("P1 - P2 = "); printPoly(P3);
-    //             break;
-
-    //         case 3:
-    //             P3 = pmult(P1, P2);
-    //             printf("P1 * P2 = "); printPoly(P3);
-    //             break;
-
-    //         // case 4:
-    //         //     P3 = psub(P1, P2);
-    //         //     printf("P1 - P2 = "); printPoly(P3);
-    //         //     break;
+            case 6:
                 
-    //     }
-    //     printf("----------------------\n");
-    // }
+                P3 = psub(P1, P2);
+                printf("P1 - P2 = P3 = "); printPoly(P3, 1);
+                break;
 
+            case 7:
+                P3 = pmult(P1, P2);
+                printf("P1 * P2 = P3 = "); printPoly(P3, 1);
+                break;
 
-
-
+            case 8:
+                printf("P1 / P2 = P3 = ");
+                P3 = pdiv(P1, P2);
+                break;
+            
+            case 9:
+                printf("Which polynomial(1,2,3): "); scanf("%d",&p);
+                if (p == 1 || p == 2 || p == 3)
+                    readPoly(findPoly(p));
+                else printf("Polynomial does not exist...\n");
+                break;
+        }
+    }
     return 0;	
 }
-
-
