@@ -109,6 +109,7 @@ void convert2postfix(treenode* root, int len, char** result, int* count){
         convert2postfix(root->rightchild, len, result, count);
         (*result)[(*count)++] = root->data;
     }
+    (*result)[*count] = '\0';
 }
 
 
@@ -214,11 +215,9 @@ int posteval(char* expression){
                 num_stack[++top] = b / a;
                 break;
             }
-        printf("%d %d\n", num_stack[top], top);
     }
-    printf("---\n");
     int ans = num_stack[top];
-    // free(num_stack);
+    free(num_stack);
     return ans;
 }
 
@@ -288,10 +287,12 @@ int digit_input(char* expression){
 
 // 8*((4+2)/(5-3))+4/(4+(2-5))  ((a+(b-k))*((m/(n*p)+n)/(d+e)))
 int main(){
-    char* post = (char*)malloc(sizeof(char) * (40)); char** ptrans = &post;
+    char* post = (char*)malloc(sizeof(char) * 40); char** ptrans = &post;
     while (1){
+        memset(post, 0, sizeof(char)*40);  // 要重制 string
         char* expression = (char*)malloc(sizeof(char) * 40);
         printf("\nPlease enter an infix expression and press enter: "); scanf("%s",expression);
+        
         if (expression[0] == 27)    // esc then quit program (esc ASCII is 27)
             break;
 
@@ -303,15 +304,12 @@ int main(){
                 // eval using postfix
                 int c = 0; int* count = &c;
                 convert2postfix(infixExpressionTree(expression), strlen(expression), ptrans, count);
-                // if (posteval(post) != -2147483648){ // division by 0
-                    printf("\n= ");
-                    printf("result %d...", posteval(post));
-                // }
+                if (posteval(post) != -2147483648) // division by 0
+                    printf("\n= %d", posteval(post));
             }
         }
         printf("\n--------------------------------------------------\n");
-        free(expression);
-        memset(post, 0, sizeof(post));  // 要重制 string
+        // free(expression);
     }
     return 0;
 }
