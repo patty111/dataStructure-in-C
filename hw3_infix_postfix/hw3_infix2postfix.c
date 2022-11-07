@@ -277,9 +277,7 @@ int digit_input(char* expression){
     for (int i=0;i<strlen(expression);i++){
         if (expression[i] == '(' || expression[i] == ')' || isoperator(expression[i]))
             continue;
-        if (isdigit(expression[i])){
-            return 1;
-        }
+        return isdigit(expression[i]);
     }
     return 0;
 }
@@ -309,7 +307,6 @@ int main(){
             }
         }
         printf("\n--------------------------------------------------\n");
-        // free(expression);
     }
     return 0;
 }
