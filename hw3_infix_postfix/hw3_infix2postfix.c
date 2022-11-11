@@ -11,11 +11,11 @@ typedef struct Tree{
 
 
 treenode* addNode(char data){
-    treenode* node = (treenode*)malloc(sizeof(treenode));
-    node->data = data;
-    node->leftchild = NULL;
-    node->rightchild = NULL;
-    return node;
+    treenode* root = (treenode*)malloc(sizeof(treenode));
+    root->data = data;
+    root->leftchild = NULL;
+    root->rightchild = NULL;
+    return root;
 }
 
 
@@ -43,8 +43,8 @@ char Cpeek(char* stack, int* top){
 }
 
 
-void Npush(treenode** stack, int* top, treenode* node){
-    stack[++(*top)] = node;
+void Npush(treenode** stack, int* top, treenode* root){
+    stack[++(*top)] = root;
 }
 
 
@@ -140,15 +140,33 @@ void preorder(treenode* root){
 }
 
 
-treenode* infixExpressionTree(char* expression){
+void levelorder(treenode* root){
+    int front = 0; int rear = 0;
+    treenode* queue[40] = {NULL};
+    queue[rear++] = root;   // enqueue
+
+    while (1){
+        root = queue[front++];  // dequeue
+        if (root){
+            printf("%c ", root->data);
+            if (root->leftchild)
+                queue[rear++] = root->leftchild;
+            if (root->rightchild)
+                queue[rear++] = root->rightchild;
+        }
+        else break;
+    }
+}
+
+
+treenode* InfixExpressionTree(char* expression){        // return root node
     expression = init(expression);
     char* cstack = (char*)malloc(sizeof(char) * strlen(expression));
     treenode** nstack = (treenode**)malloc(sizeof(treenode*) * strlen(expression));
     treenode* Tnode;
 
-    int t = -1;int nt = -1; int* ctop = &t; int* ntop = &nt;
+    int t = -1; int nt = -1; int* ctop = &t; int* ntop = &nt;
     
-
     for (int i=0;i<strlen(expression);i++){
         if (isalpha(expression[i]) || isdigit(expression[i])){       // operands
             Tnode = addNode(expression[i]);
@@ -178,9 +196,9 @@ treenode* infixExpressionTree(char* expression){
             Cpush(cstack, ctop, strlen(expression), expression[i]);
         }
     }
-    // free(cstack);
+    free(cstack);
     Tnode = Npeek(nstack, ntop);
-    // free(nstack);
+    free(nstack);
     return Tnode;
 }
 
@@ -225,23 +243,21 @@ int posteval(char* expression){
 int valid_input(char* expression){
     int Dflag = 0; int Aflag = 0;
     int lparen = 0; int rparen = 0;
-    if (!isdigit(expression[0]) && !isalpha(expression[0]) && !isoperator(expression[0]) && expression[0] != '(' && expression[0] != ')'){
+    if (!isdigit(expression[0]) && !isoperator(expression[0]) && expression[0] != '(' && expression[0] != ')'){
         printf("%s\n", expression);
         printf("^\n");
-        printf("Unknown Character!\n");
+        printf("Numbers Only!\n");
         return 0;
     }
     for (int i=1;i<strlen(expression);i++){
         // paren pairs are valid, did numbers and chars are miixed
-        lparen += ((expression[i] == '(') * 1) + ((expression[i] == ')') * 1);
-        rparen += ((expression[i] == '(') * 1) + ((expression[i] == ')') * 1);
-        Aflag = 1 * isalpha(expression[i]);
-        Dflag = 1 * isdigit(expression[i]);
+        lparen += (expression[i-1] == '(');
+        rparen += ((expression[i-1] == ')'));
         // detect unknown character
-        if (!isdigit(expression[i]) && !isalpha(expression[i]) && !isoperator(expression[i]) && expression[i] != '(' && expression[i] != ')'){
+        if (!isdigit(expression[i]) && !isoperator(expression[i]) && expression[i] != '(' && expression[i] != ')'){
             printf("%s\n", expression);
             for (int j=0;j<i;j++) printf(" "); printf("^\n");
-            for (int j=0;j<i;j++) printf(" "); printf("Unknown Character!\n");
+            for (int j=0;j<i;j++) printf(" "); printf("Numbers Only!\n");
             return 0;
         }
         // expression start/end with operator
@@ -249,23 +265,20 @@ int valid_input(char* expression){
             printf("Expression should not start/end with operator!\n");
             return 0;
         }
-        // detect continuos operand or operator
-        if ((isoperator(expression[i]) && isoperator(expression[i-1])) || ((isdigit(expression[i]) && isdigit(expression[i-1])) || (isalpha(expression[i]) && isalpha(expression[i-1])))){
+        // detect continuos operand or operator or parens pairs like "()"
+        if ((isoperator(expression[i]) && isoperator(expression[i-1])) || ((isdigit(expression[i]) && isdigit(expression[i-1]))) || (expression[i-1] == '(' && expression[i] == ')')){
             printf("%s\n", expression);
             for (int j=0;j<i;j++) printf(" "); printf("^\n");
             for (int j=0;j<i;j++) printf(" "); printf("Error Input!\n");
             return 0;
         }
+            // printf("i:%d lparen %d / rparen %d\n",i, lparen, rparen);
     }
-    lparen += ((expression[strlen(expression)-1] == '(') * 1) + ((expression[strlen(expression)-1] == ')') * 1);
-    rparen += ((expression[strlen(expression)-1] == '(') * 1) + ((expression[strlen(expression)-1] == ')') * 1);
-    if (Dflag && Aflag){
-        printf("Don't mix number with characters!\n");
-        return 0;
-    }
+    lparen += expression[strlen(expression)-1] == '(';
+    rparen += expression[strlen(expression)-1] == ')';
 
     if (lparen != rparen){
-        printf("Parens did not match!");
+        printf("Parens do not match!");
         return 0;
     }
     return 1;
@@ -295,13 +308,14 @@ int main(){
             break;
 
         if (valid_input(expression)){
-            printf("The postfix expression: "); postorder(infixExpressionTree(expression));
-            printf("\nThe prefix expression:  "); preorder(infixExpressionTree(expression));
+            printf("The postfix expression: "); postorder(InfixExpressionTree(expression));
+            printf("\nThe prefix expression:  "); preorder(InfixExpressionTree(expression));
+            printf("\nThe level-order expression:  "); levelorder(InfixExpressionTree(expression));
             
             if (digit_input(expression)){
                 // eval using postfix
                 int c = 0; int* count = &c;
-                convert2postfix(infixExpressionTree(expression), strlen(expression), ptrans, count);
+                convert2postfix(InfixExpressionTree(expression), strlen(expression), ptrans, count);
                 if (posteval(post) != -2147483648) // division by 0
                     printf("\n= %d", posteval(post));
             }
@@ -310,4 +324,3 @@ int main(){
     }
     return 0;
 }
-// 842+53-/*4425-+/+
