@@ -168,7 +168,7 @@ treenode* InfixExpressionTree(char* expression){        // return root node
     int t = -1; int nt = -1; int* ctop = &t; int* ntop = &nt;
     
     for (int i=0;i<strlen(expression);i++){
-        if (isalpha(expression[i]) || isdigit(expression[i])){       // operands
+        if (isdigit(expression[i])){       // operands
             Tnode = addNode(expression[i]);
             Npush(nstack, ntop, Tnode);
         }
@@ -250,7 +250,7 @@ int valid_input(char* expression){
         return 0;
     }
     for (int i=1;i<strlen(expression);i++){
-        // paren pairs are valid, did numbers and chars are miixed
+        // paren pairs are valid
         lparen += (expression[i-1] == '(');
         rparen += ((expression[i-1] == ')'));
         // detect unknown character
@@ -285,17 +285,6 @@ int valid_input(char* expression){
 }
 
 
-// return 1 if is digit input
-int digit_input(char* expression){
-    for (int i=0;i<strlen(expression);i++){
-        if (expression[i] == '(' || expression[i] == ')' || isoperator(expression[i]))
-            continue;
-        return isdigit(expression[i]);
-    }
-    return 0;
-}
-
-
 // 8*((4+2)/(5-3))+4/(4+(2-5))  ((a+(b-k))*((m/(n*p)+n)/(d+e)))
 int main(){
     char* post = (char*)malloc(sizeof(char) * 40); char** ptrans = &post;
@@ -312,13 +301,11 @@ int main(){
             printf("\nThe prefix expression:  "); preorder(InfixExpressionTree(expression));
             printf("\nThe level-order expression:  "); levelorder(InfixExpressionTree(expression));
             
-            if (digit_input(expression)){
-                // eval using postfix
-                int c = 0; int* count = &c;
-                convert2postfix(InfixExpressionTree(expression), strlen(expression), ptrans, count);
-                if (posteval(post) != -2147483648) // division by 0
-                    printf("\n= %d", posteval(post));
-            }
+            // eval using postfix
+            int c = 0; int* count = &c;
+            convert2postfix(InfixExpressionTree(expression), strlen(expression), ptrans, count);
+            if (posteval(post) != -2147483648) // division by 0
+                printf("\n= %d", posteval(post));
         }
         printf("\n--------------------------------------------------\n");
     }
